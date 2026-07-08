@@ -1,0 +1,17 @@
+# data (24GB Kaggle dataset - not for git)
+archive/
+data_cache/
+
+# environments
+.venv/
+
+# model checkpoints (>100MB, exceeds GitHub file limit)
+*.pt
+
+# python
+__pycache__/
+*.pyc
+
+# OS
+Thumbs.db
+desktop.ini
