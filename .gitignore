@@ -11,6 +11,12 @@ data_cache/
 # python
 __pycache__/
 *.pyc
+.pytest_cache/
+.ruff_cache/
+
+# gradio
+flagged/
+.gradio/
 
 # OS
 Thumbs.db
