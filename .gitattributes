@@ -1,0 +1,10 @@
+# Normalize line endings: LF in the repo, auto-convert on checkout.
+* text=auto eol=lf
+
+# Treat images and model checkpoints as binary.
+*.png binary
+*.jpg binary
+*.mp4 binary
+*.mov binary
+*.pt binary
+*.npy binary

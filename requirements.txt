@@ -1,0 +1,20 @@
+# Training / evaluation pipeline (GPU recommended).
+#
+# For CUDA training, install the matching torch build FIRST, then the rest:
+#   pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu121
+#   pip install -r requirements.txt
+#
+# On CPU-only machines, plain `pip install torch torchvision` works (slow training,
+# fine for inference/demo).
+
+torch==2.5.1
+torchvision==0.20.1
+numpy>=2.0
+pandas>=2.0
+opencv-python>=4.9
+scikit-learn>=1.4
+matplotlib>=3.8
+gradio>=4.0
+
+# dev / test
+pytest>=8.0

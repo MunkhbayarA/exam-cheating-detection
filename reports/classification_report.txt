@@ -1,0 +1,11 @@
+              precision    recall  f1-score   support
+
+      normal      0.500     0.333     0.400         6
+     copying      0.667     0.750     0.706         8
+     gesture      0.800     0.667     0.727         6
+      mobile      0.750     0.900     0.818        10
+       notes      0.750     0.750     0.750         8
+
+    accuracy                          0.711        38
+   macro avg      0.693     0.680     0.680        38
+weighted avg      0.701     0.711     0.700        38

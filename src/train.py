@@ -9,11 +9,12 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import f1_score
 from torch.utils.data import DataLoader
-from torchvision.models.video import r2plus1d_18, R2Plus1D_18_Weights
+from torchvision.models.video import R2Plus1D_18_Weights, r2plus1d_18
 
 from dataset import CLASSES, ClipDataset, make_splits
 
 ROOT = Path(__file__).resolve().parents[1]
+REPORTS = ROOT / "reports"
 SEED = 42
 BATCH = 8
 EPOCHS = 40
@@ -74,6 +75,7 @@ def main():
     scaler = torch.amp.GradScaler()
 
     best_f1, best_epoch = 0.0, -1
+    history = []  # per-epoch metrics -> reports/history.csv for the training-curve plot
     for epoch in range(EPOCHS):
         model.train()
         t0, losses = time.time(), []
@@ -89,20 +91,26 @@ def main():
         sched.step()
 
         val_f1, val_acc = run_eval(model, vl, device)
+        train_loss = float(np.mean(losses))
+        history.append({"epoch": epoch, "train_loss": train_loss,
+                        "val_f1": val_f1, "val_acc": val_acc})
         marker = ""
         if val_f1 > best_f1:
             best_f1, best_epoch = val_f1, epoch
             torch.save({"model": model.state_dict(), "classes": CLASSES, "epoch": epoch,
                         "val_f1": val_f1}, ROOT / "best_model.pt")
             marker = "  <- saved"
-        print(f"epoch {epoch:02d}  loss {np.mean(losses):.3f}  val_f1 {val_f1:.3f}  "
+        print(f"epoch {epoch:02d}  loss {train_loss:.3f}  val_f1 {val_f1:.3f}  "
               f"val_acc {val_acc:.3f}  ({time.time() - t0:.0f}s){marker}", flush=True)
 
         if epoch - best_epoch >= PATIENCE:
             print(f"early stop: no val improvement for {PATIENCE} epochs")
             break
 
+    REPORTS.mkdir(exist_ok=True)
+    pd.DataFrame(history).to_csv(REPORTS / "history.csv", index=False)
     print(f"best val macro-F1 {best_f1:.3f} at epoch {best_epoch}")
+    print(f"wrote training history -> {REPORTS / 'history.csv'}")
 
 
 if __name__ == "__main__":

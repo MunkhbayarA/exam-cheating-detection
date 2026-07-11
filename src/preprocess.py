@@ -18,10 +18,12 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE = ROOT / "archive"
 CACHE = ROOT / "data_cache"
+MANUAL_CSV = ROOT / "labels_manual.csv"
 N_FRAMES = 24
 SIZE = 144
 
 CLASS_MAP = {"nor": "normal", "c": "copying", "g": "gesture", "m": "mobile", "n": "notes"}
+CLASSES = set(CLASS_MAP.values())  # the 5 trained classes; "other"/unknown are dropped
 NAME_RE = re.compile(r"^(nor|c|g|m|n|s)(\d+)$", re.IGNORECASE)
 
 SOURCES = [
@@ -48,6 +50,35 @@ def collect_clips():
                 "label": CLASS_MAP[prefix],
             })
     return pd.DataFrame(rows)
+
+
+def collect_manual():
+    """Ingest human labels from labels_manual.csv (folder, path, label).
+
+    Each manually-labeled clip is its own group (unique clip_id), so it never
+    shares a split with anything else. Rows whose label is not one of the 5
+    trained classes (e.g. "other") are dropped.
+    """
+    if not MANUAL_CSV.exists():
+        return pd.DataFrame(columns=["path", "source", "clip_id", "label"])
+    man = pd.read_csv(MANUAL_CSV)
+    rows = []
+    for _, r in man.iterrows():
+        label = str(r["label"]).strip().lower()
+        if label not in CLASSES:
+            continue  # "other"/unknown — not a trained class
+        stem = Path(r["path"]).stem
+        rows.append({
+            "path": str(r["path"]),
+            "source": "manual",
+            "clip_id": f"{r['folder']}_{stem}",  # e.g. V2_1, no collision with prefix ids
+            "label": label,
+        })
+    cols = ["path", "source", "clip_id", "label"]
+    if not rows:
+        return pd.DataFrame(columns=cols)
+    # guard against the same clip being labeled twice in the CSV
+    return pd.DataFrame(rows).drop_duplicates("clip_id", keep="last")
 
 
 def extract_frames(video_path: str) -> np.ndarray | None:
@@ -84,8 +115,11 @@ def extract_frames(video_path: str) -> np.ndarray | None:
 
 def main():
     CACHE.mkdir(exist_ok=True)
-    df = collect_clips()
-    print(f"{len(df)} labeled clips found")
+    # Note: V1_raw and sample_224 deliberately share clip_ids (raw + cropped views of
+    # the same clip) — both are kept and grouped into the same split downstream.
+    df = pd.concat([collect_clips(), collect_manual()], ignore_index=True)
+    n_manual = int((df["source"] == "manual").sum())
+    print(f"{len(df)} labeled clips found ({n_manual} from labels_manual.csv)")
     print(df.groupby(["source", "label"]).size().unstack(fill_value=0))
 
     cache_paths, keep = [], []
