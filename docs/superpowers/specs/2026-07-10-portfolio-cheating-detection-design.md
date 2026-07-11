@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-10
 **Status:** Approved (design), pending spec review
-**Author:** Munkhbayar (with Claude)
+**Author:** Munkhbayar
 
 ## Goal
 
@@ -13,8 +13,8 @@ impresses AI/ML recruiters and senior engineers. Two threads:
 2. **Presentation** — live demo, polished README, reproducibility, tests/CI, and an honest
    ethics/limitations section.
 
-The maintainer (Munkhbayar) does the labeling (human judgment task); Claude builds all tooling,
-scaffolding, and runs the GPU retrain.
+The maintainer (Munkhbayar) does the labeling (human judgment task); tooling, scaffolding,
+and the GPU retrain are automated.
 
 ## Non-Goals
 
