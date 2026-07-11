@@ -13,8 +13,10 @@ fine-tuned from Kinetics-400.
 > outputs are suggestions for a human to review, never automated accusations. See
 > [Limitations & Responsible Use](#-limitations--responsible-use).
 
-> 🚧 **Live demo:** a Gradio app (`app/app.py`) runs locally today; a hosted HuggingFace Space
-> is being set up — the "Try it live" badge will land here.
+> ▶️ **[Try it live](https://exam-behavior-classifier.streamlit.app)** — upload a clip, get a
+> prediction with confidence scores.
+> 🤗 **[Model on HuggingFace](https://huggingface.co/mbradiant/exam-behavior-classifier)** —
+> weights + model card, loadable in 5 lines.
 
 ---
 
@@ -102,7 +104,8 @@ src/
   gradcam.py      "what the model looks at" heatmaps
   inference.py    shared model loading + clip preprocessing
   predict.py      CLI: classify any clip
-app/app.py        Gradio demo (upload clip → prediction + confidence + frame preview)
+streamlit_app.py  live demo (Streamlit Cloud; pulls weights from the HF model repo)
+app/app.py        Gradio demo for local use (same inference path)
 tests/            CPU unit tests (incl. the no-leakage split invariant)
 reports/          generated figures + metrics
 model_card.md     intended use, limitations, ethics
@@ -172,7 +175,7 @@ never as evidence to accuse or penalize a student. Full details in [`model_card.
 ## Roadmap
 
 - [x] Hand-label V2 and retrain (done — exposed the distribution gap above)
-- [ ] Deploy the Gradio demo to a public HuggingFace Space
+- [x] Publish the model to HuggingFace + deploy a live demo (Streamlit Cloud)
 - [ ] Per-student detection + cropping (YOLO) to unlock the V3–V5 lecture-hall footage
 - [ ] Temporal ensembling / test-time augmentation for steadier predictions
 
