@@ -1,5 +1,5 @@
 {
-  "test_accuracy": 0.8125,
-  "test_macro_f1": 0.7879,
-  "n_test_clips": 32
+  "test_accuracy": 0.7105,
+  "test_macro_f1": 0.6803,
+  "n_test_clips": 38
 }

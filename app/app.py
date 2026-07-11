@@ -7,7 +7,10 @@ Then open the printed local URL. Also the entry point for the HuggingFace Space.
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+# Works in both layouts: app/app.py inside the repo (src/ one level up) and
+# app.py at the root of a HuggingFace Space (src/ alongside).
+_HERE = Path(__file__).resolve().parent
+ROOT = _HERE if (_HERE / "src").is_dir() else _HERE.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 import gradio as gr  # noqa: E402

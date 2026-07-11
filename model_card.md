@@ -17,8 +17,12 @@
 
 ## Evaluation
 - Held-out test split, reported as accuracy + macro-F1 + per-class report + confusion matrix.
-- **Baseline (2026-07-08, 221 clips, before V2 labeling):** test accuracy **81%**, macro-F1 **0.79**.
-- _Post-V2 numbers will replace these once the retrain runs._
+- **Current (2026-07-11, 251 clips incl. 30 hand-labeled V2):** test accuracy **71.1%**,
+  macro-F1 **0.680** (n=38). Subset breakdown: **78.8%** on the original V1/sample distribution
+  (n=33) vs **20.0%** on the new out-of-distribution V2 footage (n=5) — a distribution gap, not
+  a training regression.
+- Earlier baseline (2026-07-08, 221 clips, easier 32-clip test set): 81.2% accuracy,
+  macro-F1 0.788.
 
 ## Intended Use
 - Research and education: exploring video-based action recognition on a small, noisy dataset.

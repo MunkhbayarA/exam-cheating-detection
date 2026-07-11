@@ -21,24 +21,47 @@ fine-tuned from Kinetics-400.
 ## Results
 
 Held-out **test split**, group-aware (raw + cropped views of the same clip never cross splits,
-so these numbers are leakage-free):
+so these numbers are leakage-free). Trained on 251 clips: 221 prefix-labeled + 30 hand-labeled
+V2 clips from varied real-world cameras.
 
 | Metric | Score |
 |---|---|
-| Test accuracy | **81.2%** |
-| Macro-F1 | **0.788** |
+| Test accuracy | **71.1%** |
+| Macro-F1 | **0.680** |
 | Classes | 5 |
-| Test clips | 32 |
+| Test clips | 38 |
+
+### The most interesting finding: a distribution gap
+
+Hand-labeling the 30 V2 clips (phone footage, WhatsApp re-encodes, different rooms and cameras)
+and adding them to the benchmark made the test set *harder* — and revealed how much the clean
+V1 numbers flattered the model:
+
+| Test subset | n | Accuracy |
+|---|---|---|
+| Original distribution (V1 + cropped sample) | 33 | **78.8%** |
+| New hand-labeled V2 footage | 5 | **20.0%** |
+| Overall | 38 | 71.1% |
+
+On its original distribution the model is as strong as the earlier 221-clip baseline
+(81.2% on the old 32-clip test set — statistically the same at this sample size). On genuinely
+out-of-distribution footage it collapses. Cross-domain generalization — not more epochs — is
+the real frontier for this dataset, which is why per-student cropping of the V3–V5 lecture-hall
+footage is the top roadmap item.
 
 <p align="center">
   <img src="reports/confusion_matrix.png" width="440" alt="Confusion matrix">
 </p>
 
+<p align="center">
+  <img src="reports/training_curve.png" width="560" alt="Training curve">
+</p>
+
 ### What is the model actually looking at?
 
-Grad-CAM overlays show the model attends to the **hands-and-paper** region. In the example below
-it predicts `notes` on a true `copying` clip — an honest, interpretable confusion, since both
-behaviors center on paper:
+Grad-CAM overlays show the model attends to the **hands-and-paper** region when predicting
+paper-related classes — evidence it learned behavior-relevant features rather than background
+shortcuts:
 
 <p align="center">
   <img src="reports/gradcam.png" width="820" alt="Grad-CAM heatmap over clip frames">
@@ -148,7 +171,7 @@ never as evidence to accuse or penalize a student. Full details in [`model_card.
 
 ## Roadmap
 
-- [ ] Hand-label V2 and retrain (in progress)
+- [x] Hand-label V2 and retrain (done — exposed the distribution gap above)
 - [ ] Deploy the Gradio demo to a public HuggingFace Space
 - [ ] Per-student detection + cropping (YOLO) to unlock the V3–V5 lecture-hall footage
 - [ ] Temporal ensembling / test-time augmentation for steadier predictions
